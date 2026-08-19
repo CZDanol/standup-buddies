@@ -26,7 +26,7 @@
             >
               <button
                 class="button"
-                class:is-warning={meeting.speakingState ===
+                class:is-light={meeting.speakingState ===
                   SpecialSpeakingState.Pause}
                 onclick={() =>
                   (meeting.speakingState = SpecialSpeakingState.Pause)}
@@ -86,7 +86,7 @@
               {#if attendee.isPresent}
                 <button
                   class="button is-small"
-                  class:is-danger={attendee.isSpeaking}
+                  class:is-light={attendee.isSpeaking}
                   onclick={() => meeting.toggleSpeakingState(attendee)}
                 >
                   {attendee.isSpeaking ? "Speaking" : "Speak"}
