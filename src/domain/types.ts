@@ -3,16 +3,15 @@
  */
 export interface Config {
   title: string;
-  team: Member[];
+  team: MemberConfig[];
 }
 
-export interface Member {
+export interface MemberConfig {
   id: string;
   name: string;
+
   /**
-   * Whether this member takes part in the shuffle. Defaults to true;
-   * members with `shuffle: false` are pinned before the shuffled ones,
-   * in config order.
+   * Whether this member is excluded from the shuffle. Defaults to false.
    */
-  shuffle?: boolean;
+  pinned?: boolean;
 }
