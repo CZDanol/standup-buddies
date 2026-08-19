@@ -1,6 +1,6 @@
 # Standup Buddies
 
-A simple static page daily standup helper.
+A simple static page daily standup helper. [Live demo](https://czdanol.github.io/standup-buddies/)
 
 ![Screenshot preview](etc/sshot.png)
 
