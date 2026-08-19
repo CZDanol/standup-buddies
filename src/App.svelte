@@ -1,14 +1,8 @@
 <script lang="ts">
   import { meeting } from "./meeting.svelte";
   import { SpecialSpeakingState } from "./domain/types";
-
-  /** Formats a duration as m:ss, e.g. "0:05". */
-  function formatDuration(ms: number): string {
-    const totalSeconds = Math.floor(ms / 1000);
-    const minutes = Math.floor(totalSeconds / 60);
-    const seconds = totalSeconds % 60;
-    return `${minutes}:${String(seconds).padStart(2, "0")}`;
-  }
+  import { formatDuration } from "./format";
+  import TimeSharePie from "./charts/TimeSharePie.svelte";
 </script>
 
 <svelte:head>
@@ -90,6 +84,12 @@
       <label class="label" for="seed">Shuffle seed</label>
       <div class="control">
         <input id="seed" class="input" type="text" bind:value={meeting.seed} />
+      </div>
+    </div>
+
+    <div class="columns is-centered">
+      <div class="column is-half">
+        <TimeSharePie />
       </div>
     </div>
   </div>
