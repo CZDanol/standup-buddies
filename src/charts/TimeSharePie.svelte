@@ -31,7 +31,7 @@
       },
       theme: { mode: "dark" },
       labels: states.map(speakingStateLabel),
-      colors: states.map(stateColor),
+      colors: untrack(() => states.map(stateColor)),
       legend: { show: false },
       tooltip: { y: { formatter: (value: number) => formatDuration(value) } },
       // Mayhem gets a checkered fill so it never reads as just another attendee.
@@ -96,10 +96,13 @@
   });
 
   $effect(() => {
-    // Track only state transitions;
+    // Track state transitions and the speaking order (colors follow it);
     // times are read untracked so the repaint tick does not redraw the pie.
     void meeting.speakingState;
-    chart?.updateSeries(untrack(values));
+    chart?.updateOptions({
+      colors: states.map(stateColor),
+      series: untrack(values),
+    });
   });
 </script>
 

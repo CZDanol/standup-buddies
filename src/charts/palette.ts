@@ -1,20 +1,25 @@
 import { SpecialSpeakingState } from "../domain/types";
 import { meeting, type SpeakingState } from "../meeting.svelte";
 
-/**
- * The shared chart palette (ApexCharts' default hues, reordered).
- * The first slot is reserved for Mayhem so its color never depends on the
- * attendee count; attendees take the remaining slots in roster order.
- */
-export const seriesPalette = [
-  "#FF4560",
-  "#008FFB",
-  "#00E396",
-  "#FEB019",
-  "#775DD0",
-  "#546E7A",
-  "#26A69A",
-  "#D10CE8",
+const attendeeColors = [
+  "#e6194B",
+  "#3cb44b",
+  "#ffe119",
+  "#4363d8",
+  "#f58231",
+  "#911eb4",
+  "#42d4f4",
+  "#f032e6",
+  "#bfef45",
+  "#fabed4",
+  "#469990",
+  "#dcbeff",
+  "#9A6324",
+  "#fffac8",
+  "#800000",
+  "#aaffc3",
+  "#808000",
+  "#ffd8b1",
 ];
 
 /** Color of the given speaking state, identical across all charts. */
@@ -22,13 +27,14 @@ export function stateColor(state: SpeakingState): string {
   switch (state) {
     case SpecialSpeakingState.Pause:
       // Pause is never charted; the color is arbitrary.
-      return "#808080";
+      return "#000";
     case SpecialSpeakingState.Mayhem:
-      return seriesPalette[0];
+      // Deliberately off-palette so Mayhem never impersonates an attendee.
+      return "#808080";
     default: {
-      const attendeeSlots = seriesPalette.length - 1;
-      const index = meeting.attendees.indexOf(state);
-      return seriesPalette[1 + (index % attendeeSlots)];
+      // Colors follow the current speaking order, not the roster order.
+      const index = meeting.order.indexOf(state);
+      return attendeeColors[index % attendeeColors.length];
     }
   }
 }
