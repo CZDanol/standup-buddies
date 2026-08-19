@@ -160,5 +160,5 @@ function defaultSeed(): string {
   return new Date().toLocaleDateString("sv-SE") + " ";
 }
 
-/** The meeting driven by this page, built from the config in public/config.js. */
+/** The meeting driven by this page. */
 export const meeting = new Meeting();

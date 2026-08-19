@@ -1,5 +1,5 @@
 /**
- * Shape of the runtime configuration in public/config.js.
+ * Shape of the runtime configuration.
  */
 export interface Config {
   title: string;
