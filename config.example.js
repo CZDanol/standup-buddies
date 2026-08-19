@@ -3,11 +3,11 @@
 // the build inlines config.js into dist/index.html.
 // Without a config.js, this example is used instead.
 //
-// Member ids must stay stable forever (stats are keyed on them);
-// only the display name may change.
+// Member ids must stay stable forever.
 // See types.ts for fields descriptions
 window.standupConfig = {
   title: 'Standup Buddies',
+  // shuffle: false, // keep the roster order instead of shuffling
   team: [
     { id: 'alice', name: 'Alice' },
     { id: 'bob', name: 'Bob', pinned: true },

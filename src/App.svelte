@@ -99,12 +99,14 @@
       </tbody>
     </table>
 
-    <div class="field">
-      <label class="label" for="seed">Shuffle seed</label>
-      <div class="control">
-        <input id="seed" class="input" type="text" bind:value={meeting.seed} />
+    {#if meeting.shuffleEnabled}
+      <div class="field">
+        <label class="label" for="seed">Shuffle seed</label>
+        <div class="control">
+          <input id="seed" class="input" type="text" bind:value={meeting.seed} />
+        </div>
       </div>
-    </div>
+    {/if}
 
     <StateTimeline />
     <TimeSharePie />

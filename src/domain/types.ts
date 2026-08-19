@@ -4,6 +4,12 @@
 export interface Config {
   title: string;
   team: MemberConfig[];
+
+  /**
+   * Whether the speaking order is shuffled. Defaults to true;
+   * when false, the order is simply the roster order.
+   */
+  shuffle?: boolean;
 }
 
 export interface MemberConfig {

@@ -92,9 +92,14 @@ export interface SpeakingStateSegment {
 /** The runtime state of today's standup. */
 export class Meeting {
   readonly title: string;
+
   readonly attendees: readonly Attendee[];
+
   /** When the meeting page was opened. */
   readonly startedAtMs = Date.now();
+
+  /** When off, the speaking order is simply the roster order. */
+  readonly shuffleEnabled: boolean;
 
   seed = $state(defaultSeed());
 
@@ -111,6 +116,7 @@ export class Meeting {
       throw new Error("Missing window.standupConfig");
     }
     this.title = config.title;
+    this.shuffleEnabled = config.shuffle ?? true;
     this.attendees = config.team.map((member) => new Attendee(member, this));
     // Repaint tick only — elapsed time is computed from timestamps, so a
     // throttled background tab cannot corrupt the totals.
@@ -160,9 +166,12 @@ export class Meeting {
     return accumulated + live;
   }
 
-  /** Attendees in speaking order for the current seed. */
+  /** Attendees in speaking order. */
   readonly order: readonly Attendee[] = $derived.by(() => {
     // Reading `attendees` is safe only because $derived evaluates lazily:
+    if (!this.shuffleEnabled) {
+      return this.attendees;
+    }
     const pinned = this.attendees.filter((a) => a.isPinned);
     const rest = this.attendees.filter((a) => !a.isPinned);
     return [...pinned, ...seededShuffle(rest, this.seed)];
