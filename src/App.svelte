@@ -104,4 +104,14 @@
   .table td {
     vertical-align: middle;
   }
+
+  /* Sanctioned exception #2: pinned table header, so the speaking-state
+     buttons stay reachable while scrolling. Bulma has no sticky helper.
+     The explicit background stops rows showing through the pinned header. */
+  .table thead th {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    background-color: var(--bulma-scheme-main);
+  }
 </style>
