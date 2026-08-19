@@ -1,6 +1,14 @@
 <script lang="ts">
   import { meeting } from "./meeting.svelte";
   import { SpecialSpeakingState } from "./domain/types";
+
+  /** Formats a duration as m:ss, e.g. "0:05". */
+  function formatDuration(ms: number): string {
+    const totalSeconds = Math.floor(ms / 1000);
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = totalSeconds % 60;
+    return `${minutes}:${String(seconds).padStart(2, "0")}`;
+  }
 </script>
 
 <svelte:head>
@@ -36,7 +44,9 @@
                 onclick={() =>
                   (meeting.speakingState = SpecialSpeakingState.Mayhem)}
               >
-                Mayhem
+                Mayhem ({formatDuration(
+                  meeting.speakingTimeMs(SpecialSpeakingState.Mayhem),
+                )})
               </button>
             </div>
           </th>
@@ -70,6 +80,7 @@
                       : attendee)}
                 >
                   {attendee.isSpeaking ? "Speaking" : "Speak"}
+                  ({formatDuration(attendee.speakingTimeMs)})
                 </button>
               {/if}
             </td>

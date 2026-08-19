@@ -1,3 +1,4 @@
+import { SvelteMap } from "svelte/reactivity";
 import { SpecialSpeakingState, type Config, type MemberConfig } from "./domain/types";
 import { seededShuffle } from "./domain/shuffle";
 
@@ -43,6 +44,11 @@ export class Attendee {
   get isSpeaking(): boolean {
     return this.meeting.speakingState === this;
   }
+
+  /** Total time this attendee has held the floor. */
+  get speakingTimeMs(): number {
+    return this.meeting.speakingTimeMs(this);
+  }
 }
 
 /** Who currently has the floor: one attendee, or a meeting-wide mode. */
@@ -53,7 +59,11 @@ export class Meeting {
   readonly title: string;
   readonly attendees: readonly Attendee[];
   seed = $state(defaultSeed());
-  speakingState = $state<SpeakingState>(SpecialSpeakingState.Pause);
+  private speakingState_ = $state<SpeakingState>(SpecialSpeakingState.Pause);
+  private speakingStateSince = $state(Date.now());
+  private now = $state(Date.now());
+  /** Accumulated time per speaking state, excluding the current run. */
+  private speakingStateTimesMs = new SvelteMap<SpeakingState, number>();
 
   constructor() {
     const config = window.standupConfig;
@@ -62,6 +72,34 @@ export class Meeting {
     }
     this.title = config.title;
     this.attendees = config.team.map((member) => new Attendee(member, this));
+    // Repaint tick only — elapsed time is computed from timestamps, so a
+    // throttled background tab cannot corrupt the totals.
+    setInterval(() => {
+      this.now = Date.now();
+    }, 500);
+  }
+
+  get speakingState(): SpeakingState {
+    return this.speakingState_;
+  }
+
+  set speakingState(next: SpeakingState) {
+    // Bank the time spent in the outgoing state before switching.
+    // Refreshing `now` must come first:
+    // speakingTimeMs computes the live portion from it,
+    // and banking must include time up to this instant, not up to the last repaint tick.
+    this.now = Date.now();
+    this.speakingStateTimesMs.set(this.speakingState_, this.speakingTimeMs(this.speakingState_));
+    this.speakingStateSince = this.now;
+    this.speakingState_ = next;
+  }
+
+  /** Total time spent in the given speaking state. */
+  speakingTimeMs(state: SpeakingState): number {
+    const accumulated = this.speakingStateTimesMs.get(state) ?? 0;
+    const live =
+      this.speakingState_ === state ? this.now - this.speakingStateSince : 0;
+    return accumulated + live;
   }
 
   /** Attendees in speaking order for the current seed. */
