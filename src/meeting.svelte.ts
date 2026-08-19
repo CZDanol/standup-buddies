@@ -66,6 +66,22 @@ export function speakingStateLabel(state: SpeakingState): string {
   }
 }
 
+/** Short mark of the given speaking state: attendee initials ("John Doe" -> "JD"). */
+export function speakingStateInitials(state: SpeakingState): string {
+  switch (state) {
+    case SpecialSpeakingState.Pause:
+      return "-";
+    case SpecialSpeakingState.Mayhem:
+      return "#";
+    default:
+      return state.name
+        .split(/\s+/)
+        .filter(Boolean)
+        .map((word) => word[0].toUpperCase())
+        .join("");
+  }
+}
+
 /** One finished run of a single speaking state. */
 export interface SpeakingStateSegment {
   state: SpeakingState;

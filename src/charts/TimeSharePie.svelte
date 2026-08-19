@@ -4,6 +4,7 @@
   import { SpecialSpeakingState } from "../domain/types";
   import {
     meeting,
+    speakingStateInitials,
     speakingStateLabel,
     type Attendee,
   } from "../meeting.svelte";
@@ -53,7 +54,11 @@
         },
       },
       dataLabels: {
-        enabled: false,
+        enabled: true,
+        // Inside-slice labels are just the initials; names and durations
+        // live in the external labels and the tooltip.
+        formatter: (_percent: number, opts: any) =>
+          speakingStateInitials(states[opts.seriesIndex]),
       },
       plotOptions: {
         pie: {

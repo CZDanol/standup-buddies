@@ -2,7 +2,11 @@
   import ApexCharts from "apexcharts";
   import { untrack } from "svelte";
   import { SpecialSpeakingState } from "../domain/types";
-  import { meeting, speakingStateLabel } from "../meeting.svelte";
+  import {
+    meeting,
+    speakingStateInitials,
+    speakingStateLabel,
+  } from "../meeting.svelte";
   import { formatDuration } from "../format";
   import { stateColor } from "./palette";
 
@@ -20,6 +24,7 @@
             y: [segment.startMs, segment.endMs],
             fillColor: stateColor(segment.state),
             label: speakingStateLabel(segment.state),
+            initials: speakingStateInitials(segment.state),
           })),
       },
     ];
@@ -56,7 +61,7 @@
           const point =
             opts.w.config.series[opts.seriesIndex].data[opts.dataPointIndex];
           return [
-            point.label,
+            point.initials,
             formatDuration(point.y[1] - point.y[0]), //
           ];
         },
