@@ -1,5 +1,6 @@
 <script lang="ts">
   import { meeting } from "./meeting.svelte";
+  import { SpecialSpeakingState } from "./domain/types";
 </script>
 
 <svelte:head>
@@ -15,22 +16,63 @@
         <tr>
           <th class="is-narrow">#</th>
           <th>Members</th>
-          <th class="is-narrow"></th>
+          <th class="is-narrow">
+            <div
+              class="buttons are-small is-flex-wrap-nowrap is-justify-content-flex-end"
+            >
+              <button
+                class="button"
+                class:is-warning={meeting.speakingState ===
+                  SpecialSpeakingState.Pause}
+                onclick={() =>
+                  (meeting.speakingState = SpecialSpeakingState.Pause)}
+              >
+                Pause
+              </button>
+              <button
+                class="button"
+                class:is-danger={meeting.speakingState ===
+                  SpecialSpeakingState.Mayhem}
+                onclick={() =>
+                  (meeting.speakingState = SpecialSpeakingState.Mayhem)}
+              >
+                Mayhem
+              </button>
+            </div>
+          </th>
         </tr>
       </thead>
       <tbody>
         {#each meeting.order as attendee, index (attendee.id)}
-          <tr>
-            <td class="is-narrow" class:has-text-grey={!attendee.present}>
+          <tr class:is-warning={attendee.isSpeaking}>
+            <td class="is-narrow" class:has-text-grey={!attendee.isPresent}>
               {index + 1}
             </td>
-            <td class:has-text-grey={!attendee.present}>
+            <td class:has-text-grey={!attendee.isPresent}>
               <label class="checkbox">
-                <input type="checkbox" bind:checked={attendee.present} />
+                <input
+                  type="checkbox"
+                  checked={attendee.isPresent}
+                  onchange={(event) =>
+                    attendee.setPresent(event.currentTarget.checked)}
+                />
                 {attendee.name}
               </label>
             </td>
-            <td class="is-narrow"></td>
+            <td class="is-narrow has-text-right">
+              {#if attendee.isPresent}
+                <button
+                  class="button is-small"
+                  class:is-danger={attendee.isSpeaking}
+                  onclick={() =>
+                    (meeting.speakingState = attendee.isSpeaking
+                      ? SpecialSpeakingState.Pause
+                      : attendee)}
+                >
+                  {attendee.isSpeaking ? "Speaking" : "Speak"}
+                </button>
+              {/if}
+            </td>
           </tr>
         {/each}
       </tbody>
@@ -44,3 +86,11 @@
     </div>
   </div>
 </section>
+
+<style>
+  /* Sanctioned exception to the Bulma-only rule: Bulma sets table cells to
+     vertical-align: top and offers no helper to change it. */
+  .table td {
+    vertical-align: middle;
+  }
+</style>
