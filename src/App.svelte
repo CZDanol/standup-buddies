@@ -107,12 +107,7 @@
     </div>
 
     <StateTimeline />
-
-    <div class="columns is-centered">
-      <div class="column is-half">
-        <TimeSharePie />
-      </div>
-    </div>
+    <TimeSharePie />
   </div>
 </section>
 

@@ -2,7 +2,11 @@
   import ApexCharts from "apexcharts";
   import { untrack } from "svelte";
   import { SpecialSpeakingState } from "../domain/types";
-  import { meeting, speakingStateLabel, type Attendee } from "../meeting.svelte";
+  import {
+    meeting,
+    speakingStateLabel,
+    type Attendee,
+  } from "../meeting.svelte";
   import { formatDuration } from "../format";
   import { stateColor } from "./palette";
 
@@ -26,9 +30,12 @@
     chart = new ApexCharts(container, {
       chart: {
         type: "donut",
-        height: 500,
+        height: 640,
         background: "transparent",
       },
+      // Breathing room for the external labels above and below the circle.
+      // The top needs less: the pie already sits low
+      grid: { padding: { top: 20, bottom: 60 } },
       theme: { mode: "dark" },
       labels: states.map(speakingStateLabel),
       colors: untrack(() => states.map(stateColor)),
@@ -55,10 +62,10 @@
           dataLabels: {
             external: {
               show: true,
-              formatter: (name: string, opts: any) => [
-                name,
-                formatDuration(opts.value),
-              ],
+              // Tiny slices get no label
+              // (minAngleToShowLabel does not apply to external labels.)
+              formatter: (name: string, opts: any) =>
+                opts.percent < 5 ? "" : [name, formatDuration(opts.value)],
             },
           },
           donut: {
