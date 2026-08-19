@@ -4,6 +4,7 @@
   import { formatDuration } from "./format";
   import StateTimeline from "./charts/StateTimeline.svelte";
   import TimeSharePie from "./charts/TimeSharePie.svelte";
+  import { stateColor } from "./charts/palette";
 </script>
 
 <svelte:head>
@@ -51,11 +52,28 @@
         {#each meeting.order as attendee, index (attendee.id)}
           <tr class:is-warning={attendee.isSpeaking}>
             <td class="is-narrow" class:has-text-grey={!attendee.isPresent}>
+              <svg
+                class="mr-2"
+                width="4"
+                height="24"
+                style="vertical-align: middle"
+                role="presentation"
+              >
+                {#if attendee.isPresent}
+                  <rect
+                    width="4"
+                    height="24"
+                    rx="2"
+                    fill={stateColor(attendee)}
+                  />
+                {/if}
+              </svg>
               {index + 1}
             </td>
             <td class:has-text-grey={!attendee.isPresent}>
               <label class="checkbox">
                 <input
+                  class="mr-2"
                   type="checkbox"
                   checked={attendee.isPresent}
                   onchange={(event) =>
