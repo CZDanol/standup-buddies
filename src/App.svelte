@@ -123,6 +123,16 @@
     vertical-align: middle;
   }
 
+  /* Sanctioned exception #3: soften the speaker-highlight change;
+     Bulma has no transition helpers. */
+  .table tbody tr,
+  .table tbody td {
+    transition:
+      background-color 0.5s ease,
+      border-color 0.5s ease,
+      color 0.5s ease;
+  }
+
   /* Sanctioned exception #2: pinned table header, so the speaking-state
      buttons stay reachable while scrolling. Bulma has no sticky helper.
      The explicit background stops rows showing through the pinned header. */
