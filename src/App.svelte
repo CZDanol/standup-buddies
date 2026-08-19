@@ -2,6 +2,7 @@
   import { meeting } from "./meeting.svelte";
   import { SpecialSpeakingState } from "./domain/types";
   import { formatDuration } from "./format";
+  import StateTimeline from "./charts/StateTimeline.svelte";
   import TimeSharePie from "./charts/TimeSharePie.svelte";
 </script>
 
@@ -86,6 +87,8 @@
         <input id="seed" class="input" type="text" bind:value={meeting.seed} />
       </div>
     </div>
+
+    <StateTimeline />
 
     <div class="columns is-centered">
       <div class="column is-half">

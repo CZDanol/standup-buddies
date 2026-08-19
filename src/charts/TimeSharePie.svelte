@@ -2,18 +2,15 @@
   import ApexCharts from "apexcharts";
   import { untrack } from "svelte";
   import { SpecialSpeakingState } from "../domain/types";
-  import { meeting, type Attendee } from "../meeting.svelte";
+  import { meeting, speakingStateLabel, type Attendee } from "../meeting.svelte";
   import { formatDuration } from "../format";
+  import { stateColor } from "./palette";
 
   type Slice = Attendee | SpecialSpeakingState.Mayhem;
 
   // Slice order is fixed: roster order, then Mayhem.
   // Pause is deliberately not shown.
   const states: Slice[] = [...meeting.attendees, SpecialSpeakingState.Mayhem];
-
-  function sliceLabel(slice: Slice): string {
-    return slice === SpecialSpeakingState.Mayhem ? "Mayhem" : slice.name;
-  }
 
   function values(): number[] {
     return states.map((state) => meeting.speakingTimeMs(state));
@@ -33,7 +30,8 @@
         background: "transparent",
       },
       theme: { mode: "dark" },
-      labels: states.map(sliceLabel),
+      labels: states.map(speakingStateLabel),
+      colors: states.map(stateColor),
       legend: { show: false },
       tooltip: { y: { formatter: (value: number) => formatDuration(value) } },
       // Mayhem gets a checkered fill so it never reads as just another attendee.

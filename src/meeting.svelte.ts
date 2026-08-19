@@ -54,16 +54,40 @@ export class Attendee {
 /** Who currently has the floor: one attendee, or a meeting-wide mode. */
 export type SpeakingState = Attendee | SpecialSpeakingState;
 
+/** Display label of the given speaking state. */
+export function speakingStateLabel(state: SpeakingState): string {
+  switch (state) {
+    case SpecialSpeakingState.Pause:
+      return "Pause";
+    case SpecialSpeakingState.Mayhem:
+      return "Mayhem";
+    default:
+      return state.name;
+  }
+}
+
+/** One finished run of a single speaking state. */
+export interface SpeakingStateSegment {
+  state: SpeakingState;
+  startMs: number;
+  endMs: number;
+}
+
 /** The runtime state of today's standup. */
 export class Meeting {
   readonly title: string;
   readonly attendees: readonly Attendee[];
+  /** When the meeting page was opened. */
+  readonly startedAtMs = Date.now();
+
   seed = $state(defaultSeed());
+
   private speakingState_ = $state<SpeakingState>(SpecialSpeakingState.Pause);
   private speakingStateSince = $state(Date.now());
   private now = $state(Date.now());
   /** Accumulated time per speaking state, excluding the current run. */
-  private speakingStateTimesMs = new SvelteMap<SpeakingState, number>();
+  private speakingStateDurationsMs = new SvelteMap<SpeakingState, number>();
+  private speakingStateHistory_ = $state<SpeakingStateSegment[]>([]);
 
   constructor() {
     const config = window.standupConfig;
@@ -89,9 +113,21 @@ export class Meeting {
     // speakingTimeMs computes the live portion from it,
     // and banking must include time up to this instant, not up to the last repaint tick.
     this.now = Date.now();
-    this.speakingStateTimesMs.set(this.speakingState_, this.speakingTimeMs(this.speakingState_));
+    this.speakingStateDurationsMs.set(this.speakingState_, this.speakingTimeMs(this.speakingState_));
+    if (this.now > this.speakingStateSince) {
+      this.speakingStateHistory_.push({
+        state: this.speakingState_,
+        startMs: this.speakingStateSince,
+        endMs: this.now,
+      });
+    }
     this.speakingStateSince = this.now;
     this.speakingState_ = next;
+  }
+
+  /** Finished speaking runs, oldest first; the still-running state is not included. */
+  get speakingStateHistory(): readonly SpeakingStateSegment[] {
+    return this.speakingStateHistory_;
   }
 
   /** Activates the given speaking state, or pauses if it is already active. */
@@ -102,7 +138,7 @@ export class Meeting {
 
   /** Total time spent in the given speaking state. */
   speakingTimeMs(state: SpeakingState): number {
-    const accumulated = this.speakingStateTimesMs.get(state) ?? 0;
+    const accumulated = this.speakingStateDurationsMs.get(state) ?? 0;
     const live =
       this.speakingState_ === state ? this.now - this.speakingStateSince : 0;
     return accumulated + live;
