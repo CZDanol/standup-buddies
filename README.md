@@ -12,6 +12,8 @@ A simple static page daily standup helper.
 Built with Svelte 5, TypeScript, Bulma and ApexCharts.
 No backend, no external runtime dependencies — everything is bundled.
 
+DISCLAIMER: This was an evening project with Claude. It was not vibe-coded, but I also wasn't as thorough as I usually am.
+
 ## Configuration
 
 The team roster and page title live in `config.js` (gitignored).
