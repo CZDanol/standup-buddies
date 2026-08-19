@@ -94,6 +94,12 @@ export class Meeting {
     this.speakingState_ = next;
   }
 
+  /** Activates the given speaking state, or pauses if it is already active. */
+  toggleSpeakingState(state: SpeakingState): void {
+    this.speakingState =
+      this.speakingState_ === state ? SpecialSpeakingState.Pause : state;
+  }
+
   /** Total time spent in the given speaking state. */
   speakingTimeMs(state: SpeakingState): number {
     const accumulated = this.speakingStateTimesMs.get(state) ?? 0;

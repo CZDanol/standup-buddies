@@ -42,7 +42,7 @@
                 class:is-danger={meeting.speakingState ===
                   SpecialSpeakingState.Mayhem}
                 onclick={() =>
-                  (meeting.speakingState = SpecialSpeakingState.Mayhem)}
+                  meeting.toggleSpeakingState(SpecialSpeakingState.Mayhem)}
               >
                 Mayhem ({formatDuration(
                   meeting.speakingTimeMs(SpecialSpeakingState.Mayhem),
@@ -74,10 +74,7 @@
                 <button
                   class="button is-small"
                   class:is-danger={attendee.isSpeaking}
-                  onclick={() =>
-                    (meeting.speakingState = attendee.isSpeaking
-                      ? SpecialSpeakingState.Pause
-                      : attendee)}
+                  onclick={() => meeting.toggleSpeakingState(attendee)}
                 >
                   {attendee.isSpeaking ? "Speaking" : "Speak"}
                   ({formatDuration(attendee.speakingTimeMs)})
