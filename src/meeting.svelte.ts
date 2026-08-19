@@ -103,11 +103,12 @@ export class Meeting {
   }
 
   /** Attendees in speaking order for the current seed. */
-  get order(): Attendee[] {
+  readonly order: readonly Attendee[] = $derived.by(() => {
+    // Reading `attendees` is safe only because $derived evaluates lazily:
     const pinned = this.attendees.filter((a) => a.isPinned);
     const rest = this.attendees.filter((a) => !a.isPinned);
     return [...pinned, ...seededShuffle(rest, this.seed)];
-  }
+  });
 }
 
 /** The shuffle seed a meeting starts with. */
