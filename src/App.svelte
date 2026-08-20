@@ -28,10 +28,11 @@
                 class="button"
                 class:is-light={meeting.speakingState ===
                   SpecialSpeakingState.Pause}
+                title="Pause"
                 onclick={() =>
                   meeting.toggleSpeakingState(SpecialSpeakingState.Pause)}
               >
-                Pause
+                ⏸
               </button>
               <button
                 class="button"
