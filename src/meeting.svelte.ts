@@ -54,6 +54,9 @@ export class Attendee {
 /** Who currently has the floor: one attendee, or a meeting-wide mode. */
 export type SpeakingState = Attendee | SpecialSpeakingState;
 
+/** Segments shorter than this are discarded */
+const minimumHistorySegmentDurationMs = 1000;
+
 /** Display label of the given speaking state. */
 export function speakingStateLabel(state: SpeakingState): string {
   switch (state) {
@@ -131,13 +134,15 @@ export class Meeting {
   }
 
   set speakingState(next: SpeakingState) {
+    if (next === this.speakingState) return;
+
     // Bank the time spent in the outgoing state before switching.
     // Refreshing `now` must come first:
     // speakingTimeMs computes the live portion from it,
     // and banking must include time up to this instant, not up to the last repaint tick.
     this.now = Date.now();
     this.speakingStateDurationsMs.set(this.speakingState_, this.speakingTimeMs(this.speakingState_));
-    if (this.now > this.speakingStateSince) {
+    if (this.speakingState !== SpecialSpeakingState.Pause && this.now > this.speakingStateSince + minimumHistorySegmentDurationMs) {
       this.speakingStateHistory_.push({
         state: this.speakingState_,
         startMs: this.speakingStateSince,
