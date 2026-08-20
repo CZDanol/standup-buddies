@@ -1,5 +1,10 @@
 # Changelog
 
+## v1.1.1 (2026-08-20)
+
+1. While paused, previous/next move the pending speaker without starting their timer; unpausing then gives the floor to whoever is selected.
+1. The timeline chart no longer records pauses or accidental sub-second speaking blips; the timers themselves stay exact.
+
 ## v1.1.0 (2026-08-20)
 
 1. Meeting controls moved into a navbar fixed to the top of the page; the table header is gone.
