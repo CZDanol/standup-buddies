@@ -1,10 +1,27 @@
 <script lang="ts">
-  import { meeting } from "./meeting.svelte";
+  import { meeting, Attendee } from "./meeting.svelte";
   import { SpecialSpeakingState } from "./domain/types";
   import { formatDuration } from "./format";
   import StateTimeline from "./charts/StateTimeline.svelte";
   import TimeSharePie from "./charts/TimeSharePie.svelte";
   import { stateColor } from "./charts/palette";
+
+  let attendeeRows: Record<string, HTMLTableRowElement> = {};
+
+  function ensureSpeakerInView(attendee: Attendee): void {
+    // The margin comes from the rows' scroll-margin; see the style block.
+    attendeeRows[attendee.id]?.scrollIntoView({
+      block: "nearest",
+      behavior: "smooth",
+    });
+  }
+
+  $effect(() => {
+    const speaker = meeting.speakingState;
+    if (speaker instanceof Attendee) {
+      ensureSpeakerInView(speaker);
+    }
+  });
 </script>
 
 <svelte:head>
@@ -52,6 +69,7 @@
       <tbody>
         {#each meeting.order as attendee, index (attendee.id)}
           <tr
+            bind:this={attendeeRows[attendee.id]}
             class:is-warning={attendee.isSpeaking}
             class:has-background-warning-15={!attendee.isSpeaking &&
               attendee === meeting.lastSpeaker}
@@ -124,10 +142,20 @@
 </section>
 
 <style>
-  /* Sanctioned exception to the Bulma-only rule: Bulma sets table cells to
+  /* Sanctioned exception #1 to the Bulma-only rule: Bulma sets table cells to
      vertical-align: top and offers no helper to change it. */
   .table td {
     vertical-align: middle;
+  }
+
+  /* Sanctioned exception #2: pinned table header, so the speaking-state
+     buttons stay reachable while scrolling. Bulma has no sticky helper.
+     The explicit background stops rows showing through the pinned header. */
+  .table thead th {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    background-color: var(--bulma-scheme-main);
   }
 
   /* Sanctioned exception #3: soften the speaker-highlight change;
@@ -140,13 +168,11 @@
       color 0.5s ease;
   }
 
-  /* Sanctioned exception #2: pinned table header, so the speaking-state
-     buttons stay reachable while scrolling. Bulma has no sticky helper.
-     The explicit background stops rows showing through the pinned header. */
-  .table thead th {
-    position: sticky;
-    top: 0;
-    z-index: 1;
-    background-color: var(--bulma-scheme-main);
+  /* Sanctioned exception #4: breathing room for scrollIntoView(block: "nearest")
+     when jumping to the current speaker — scroll-margin has no Bulma helper.
+     The top margin is larger to also clear the sticky header. */
+  .table tbody tr {
+    scroll-margin-top: 8em;
+    scroll-margin-bottom: 5em;
   }
 </style>
