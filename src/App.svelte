@@ -35,18 +35,6 @@
         <h1 class="title is-5">{meeting.title}</h1>
       </div>
       <div class="navbar-item ml-auto">
-        {#if meeting.lastSpeaker}
-          <div class="tags has-addons">
-            <span class="tag" class:is-warning={meeting.lastSpeaker.isSpeaking}>
-              {meeting.lastSpeaker.name}
-            </span>
-            <span class="tag is-dark duration">
-              {formatDuration(meeting.lastSpeaker.speakingTimeMs)}
-            </span>
-          </div>
-        {/if}
-      </div>
-      <div class="navbar-item">
         <div class="buttons are-small is-flex-wrap-nowrap">
           <button
             class="button"
@@ -58,16 +46,30 @@
             ⏮
           </button>
 
-          <button
-            class="button"
-            class:is-light={meeting.speakingState ===
-              SpecialSpeakingState.Pause}
-            title="Pause"
-            onclick={() =>
-              meeting.toggleSpeakingState(SpecialSpeakingState.Pause)}
-          >
-            ⏸
-          </button>
+          {#if meeting.lastSpeaker}
+            <div class="field has-addons mb-0">
+              <p class="control">
+                <button
+                  class="button"
+                  class:is-warning={meeting.lastSpeaker.isSpeaking}
+                  class:is-dark={meeting.speakingState ===
+                    SpecialSpeakingState.Pause}
+                  title="Pause / resume"
+                  onclick={() =>
+                    meeting.toggleSpeakingState(meeting.lastSpeaker!)}
+                >
+                  {meeting.lastSpeaker.name}
+                </button>
+              </p>
+              <p class="control">
+                <span
+                  class="button is-static has-text-white has-text-weight-bold duration"
+                >
+                  {formatDuration(meeting.lastSpeaker.speakingTimeMs)}
+                </span>
+              </p>
+            </div>
+          {/if}
 
           <button
             class="button"

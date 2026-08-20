@@ -151,9 +151,13 @@ export class Meeting {
     }
   }
 
-  /** The attendee who most recently held the floor, kept over pauses and mayhems. */
+  /**
+   * The attendee who most recently held the floor, kept over pauses and mayhems.
+   * Before anyone has spoken it is the first present attendee in the order;
+   * null only when nobody is present.
+   */
   get lastSpeaker(): Attendee | null {
-    return this.lastSpeaker_;
+    return this.lastSpeaker_ ?? this.order.find((a) => a.isPresent) ?? null;
   }
 
   /** Finished speaking runs, oldest first; the still-running state is not included. */
@@ -166,9 +170,9 @@ export class Meeting {
     if (this.speakingState_ !== state)
       this.speakingState = state;
 
-    else if (state === SpecialSpeakingState.Pause && this.lastSpeaker_)
+    else if (state === SpecialSpeakingState.Pause && this.lastSpeaker)
       // Unpause - return to the last speaker
-      this.speakingState = this.lastSpeaker_;
+      this.speakingState = this.lastSpeaker;
 
     else
       this.speakingState = SpecialSpeakingState.Pause;
