@@ -40,7 +40,7 @@
             <span class="tag" class:is-warning={meeting.lastSpeaker.isSpeaking}>
               {meeting.lastSpeaker.name}
             </span>
-            <span class="tag is-dark">
+            <span class="tag is-dark duration">
               {formatDuration(meeting.lastSpeaker.speakingTimeMs)}
             </span>
           </div>
@@ -79,17 +79,24 @@
             ⏭
           </button>
 
-          <button
-            class="button"
-            class:is-danger={meeting.speakingState ===
-              SpecialSpeakingState.Mayhem}
-            onclick={() =>
-              meeting.toggleSpeakingState(SpecialSpeakingState.Mayhem)}
-          >
-            Mayhem ({formatDuration(
-              meeting.speakingTimeMs(SpecialSpeakingState.Mayhem),
-            )})
-          </button>
+          <div class="field has-addons">
+            <p class="control">
+              <button
+                class="button"
+                class:is-danger={meeting.speakingState ===
+                  SpecialSpeakingState.Mayhem}
+                onclick={() =>
+                  meeting.toggleSpeakingState(SpecialSpeakingState.Mayhem)}
+              >
+                Mayhem
+              </button>
+            </p>
+            <p class="control">
+              <span class="button is-static has-text-text duration">
+                {formatDuration(meeting.speakingTimeMs(SpecialSpeakingState.Mayhem))}
+              </span>
+            </p>
+          </div>
         </div>
       </div>
     </div>
@@ -140,14 +147,22 @@
             </td>
             <td class="is-narrow has-text-right">
               {#if attendee.isPresent}
-                <button
-                  class="button is-small"
-                  class:is-light={attendee.isSpeaking}
-                  onclick={() => meeting.toggleSpeakingState(attendee)}
-                >
-                  {attendee.isSpeaking ? "Speaking" : "Speak"}
-                  ({formatDuration(attendee.speakingTimeMs)})
-                </button>
+                <div class="field has-addons is-justify-content-flex-end">
+                  <p class="control">
+                    <button
+                      class="button is-small"
+                      class:is-light={attendee.isSpeaking}
+                      onclick={() => meeting.toggleSpeakingState(attendee)}
+                    >
+                      {attendee.isSpeaking ? "Speaking" : "Speak"}
+                    </button>
+                  </p>
+                  <p class="control">
+                    <span class="button is-small is-static has-text-text duration">
+                      {formatDuration(attendee.speakingTimeMs)}
+                    </span>
+                  </p>
+                </div>
               {/if}
             </td>
           </tr>
@@ -187,6 +202,12 @@
       background-color 0.5s ease,
       border-color 0.5s ease,
       color 0.5s ease;
+  }
+
+  /* The ticking durations otherwise wobble with every digit change;
+     Bulma has no helper for tabular digits. */
+  .duration {
+    font-variant-numeric: tabular-nums;
   }
 
   /* Breathing room for scrollIntoView(block: "nearest") when jumping to the current speaker;
