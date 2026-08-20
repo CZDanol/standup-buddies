@@ -174,6 +174,32 @@ export class Meeting {
       this.speakingState = SpecialSpeakingState.Pause;
   }
 
+  /**
+   * The nearest present attendee in the given direction from the last
+   * speaker, or null past either end.
+   */
+  adjacentSpeaker(step: 1 | -1): Attendee | null {
+    const order = this.order;
+    const reference = this.lastSpeaker_;
+
+    let index = reference
+      ? order.indexOf(reference) + step
+      // Before anyone has spoken, only "next" has somewhere to go: the start.
+      : (step === 1 ? 0 : -1);
+
+    for (; index >= 0 && index < order.length; index += step) {
+      if (order[index].isPresent) {
+        return order[index];
+      }
+    }
+    return null;
+  }
+
+  adjacentSpeakingState(step: 1 | -1): SpeakingState | null {
+    return this.adjacentSpeaker(step)
+      ?? (this.speakingState !== SpecialSpeakingState.Pause ? SpecialSpeakingState.Pause : null);
+  }
+
   /** Total time spent in the given speaking state. */
   speakingTimeMs(state: SpeakingState): number {
     const accumulated = this.speakingStateDurationsMs.get(state) ?? 0;

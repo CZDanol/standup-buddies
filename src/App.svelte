@@ -43,6 +43,16 @@
             >
               <button
                 class="button"
+                title="Previous speaker"
+                disabled={meeting.adjacentSpeakingState(-1) === null}
+                onclick={() =>
+                  (meeting.speakingState = meeting.adjacentSpeakingState(-1)!)}
+              >
+                ⏮
+              </button>
+
+              <button
+                class="button"
                 class:is-light={meeting.speakingState ===
                   SpecialSpeakingState.Pause}
                 title="Pause"
@@ -51,6 +61,17 @@
               >
                 ⏸
               </button>
+
+              <button
+                class="button"
+                title="Next speaker"
+                disabled={meeting.adjacentSpeakingState(1) === null}
+                onclick={() =>
+                  (meeting.speakingState = meeting.adjacentSpeakingState(1)!)}
+              >
+                ⏭
+              </button>
+
               <button
                 class="button"
                 class:is-danger={meeting.speakingState ===
