@@ -35,6 +35,18 @@
         <h1 class="title is-5">{meeting.title}</h1>
       </div>
       <div class="navbar-item ml-auto">
+        {#if meeting.lastSpeaker}
+          <div class="tags has-addons">
+            <span class="tag" class:is-warning={meeting.lastSpeaker.isSpeaking}>
+              {meeting.lastSpeaker.name}
+            </span>
+            <span class="tag is-dark">
+              {formatDuration(meeting.lastSpeaker.speakingTimeMs)}
+            </span>
+          </div>
+        {/if}
+      </div>
+      <div class="navbar-item">
         <div class="buttons are-small is-flex-wrap-nowrap">
           <button
             class="button"
