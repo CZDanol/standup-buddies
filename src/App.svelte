@@ -28,65 +28,65 @@
   <title>{meeting.title}</title>
 </svelte:head>
 
-<section class="section">
+<nav class="navbar is-fixed-top" aria-label="meeting controls">
   <div class="container is-max-desktop">
-    <h1 class="title">{meeting.title}</h1>
+    <div class="navbar-brand is-flex-grow-1">
+      <div class="navbar-item">
+        <h1 class="title is-5">{meeting.title}</h1>
+      </div>
+      <div class="navbar-item ml-auto">
+        <div class="buttons are-small is-flex-wrap-nowrap">
+          <button
+            class="button"
+            title="Previous speaker"
+            disabled={meeting.adjacentSpeakingState(-1) === null}
+            onclick={() =>
+              (meeting.speakingState = meeting.adjacentSpeakingState(-1)!)}
+          >
+            ⏮
+          </button>
 
+          <button
+            class="button"
+            class:is-light={meeting.speakingState ===
+              SpecialSpeakingState.Pause}
+            title="Pause"
+            onclick={() =>
+              meeting.toggleSpeakingState(SpecialSpeakingState.Pause)}
+          >
+            ⏸
+          </button>
+
+          <button
+            class="button"
+            title="Next speaker"
+            disabled={meeting.adjacentSpeakingState(1) === null}
+            onclick={() =>
+              (meeting.speakingState = meeting.adjacentSpeakingState(1)!)}
+          >
+            ⏭
+          </button>
+
+          <button
+            class="button"
+            class:is-danger={meeting.speakingState ===
+              SpecialSpeakingState.Mayhem}
+            onclick={() =>
+              meeting.toggleSpeakingState(SpecialSpeakingState.Mayhem)}
+          >
+            Mayhem ({formatDuration(
+              meeting.speakingTimeMs(SpecialSpeakingState.Mayhem),
+            )})
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<section class="section pt-4">
+  <div class="container is-max-desktop">
     <table class="table is-fullwidth is-hoverable is-striped">
-      <thead>
-        <tr>
-          <th class="is-narrow">#</th>
-          <th>Members</th>
-          <th class="is-narrow">
-            <div
-              class="buttons are-small is-flex-wrap-nowrap is-justify-content-flex-end"
-            >
-              <button
-                class="button"
-                title="Previous speaker"
-                disabled={meeting.adjacentSpeakingState(-1) === null}
-                onclick={() =>
-                  (meeting.speakingState = meeting.adjacentSpeakingState(-1)!)}
-              >
-                ⏮
-              </button>
-
-              <button
-                class="button"
-                class:is-light={meeting.speakingState ===
-                  SpecialSpeakingState.Pause}
-                title="Pause"
-                onclick={() =>
-                  meeting.toggleSpeakingState(SpecialSpeakingState.Pause)}
-              >
-                ⏸
-              </button>
-
-              <button
-                class="button"
-                title="Next speaker"
-                disabled={meeting.adjacentSpeakingState(1) === null}
-                onclick={() =>
-                  (meeting.speakingState = meeting.adjacentSpeakingState(1)!)}
-              >
-                ⏭
-              </button>
-
-              <button
-                class="button"
-                class:is-danger={meeting.speakingState ===
-                  SpecialSpeakingState.Mayhem}
-                onclick={() =>
-                  meeting.toggleSpeakingState(SpecialSpeakingState.Mayhem)}
-              >
-                Mayhem ({formatDuration(
-                  meeting.speakingTimeMs(SpecialSpeakingState.Mayhem),
-                )})
-              </button>
-            </div>
-          </th>
-        </tr>
-      </thead>
       <tbody>
         {#each meeting.order as attendee, index (attendee.id)}
           <tr
@@ -163,24 +163,12 @@
 </section>
 
 <style>
-  /* Sanctioned exception #1 to the Bulma-only rule: Bulma sets table cells to
-     vertical-align: top and offers no helper to change it. */
+  /* Bulma sets table cells to vertical-align: top and offers no helper to change it. */
   .table td {
     vertical-align: middle;
   }
 
-  /* Sanctioned exception #2: pinned table header, so the speaking-state
-     buttons stay reachable while scrolling. Bulma has no sticky helper.
-     The explicit background stops rows showing through the pinned header. */
-  .table thead th {
-    position: sticky;
-    top: 0;
-    z-index: 1;
-    background-color: var(--bulma-scheme-main);
-  }
-
-  /* Sanctioned exception #3: soften the speaker-highlight change;
-     Bulma has no transition helpers. */
+  /* Soften the speaker-highlight change; Bulma has no transition helpers. */
   .table tbody tr,
   .table tbody td {
     transition:
@@ -189,9 +177,9 @@
       color 0.5s ease;
   }
 
-  /* Sanctioned exception #4: breathing room for scrollIntoView(block: "nearest")
-     when jumping to the current speaker — scroll-margin has no Bulma helper.
-     The top margin is larger to also clear the sticky header. */
+  /* Breathing room for scrollIntoView(block: "nearest") when jumping to the current speaker;
+     scroll-margin has no Bulma helper.
+     The top margin is larger to also clear the fixed navbar. */
   .table tbody tr {
     scroll-margin-top: 8em;
     scroll-margin-bottom: 5em;
