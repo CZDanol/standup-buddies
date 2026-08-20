@@ -15,7 +15,7 @@
   <div class="container is-max-desktop">
     <h1 class="title">{meeting.title}</h1>
 
-    <table class="table is-fullwidth is-hoverable">
+    <table class="table is-fullwidth is-hoverable is-striped">
       <thead>
         <tr>
           <th class="is-narrow">#</th>
@@ -50,7 +50,11 @@
       </thead>
       <tbody>
         {#each meeting.order as attendee, index (attendee.id)}
-          <tr class:is-warning={attendee.isSpeaking}>
+          <tr
+            class:is-warning={attendee.isSpeaking}
+            class:has-background-warning-15={!attendee.isSpeaking &&
+              attendee === meeting.lastSpeaker}
+          >
             <td class="is-narrow" class:has-text-grey={!attendee.isPresent}>
               <svg
                 class="mr-2"
@@ -103,7 +107,12 @@
       <div class="field">
         <label class="label" for="seed">Shuffle seed</label>
         <div class="control">
-          <input id="seed" class="input" type="text" bind:value={meeting.seed} />
+          <input
+            id="seed"
+            class="input"
+            type="text"
+            bind:value={meeting.seed}
+          />
         </div>
       </div>
     {/if}

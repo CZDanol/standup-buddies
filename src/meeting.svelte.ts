@@ -104,6 +104,7 @@ export class Meeting {
   seed = $state(defaultSeed());
 
   private speakingState_ = $state<SpeakingState>(SpecialSpeakingState.Pause);
+  private lastSpeaker_ = $state<Attendee | null>(null);
   private speakingStateSince = $state(Date.now());
   private now = $state(Date.now());
   /** Accumulated time per speaking state, excluding the current run. */
@@ -145,6 +146,14 @@ export class Meeting {
     }
     this.speakingStateSince = this.now;
     this.speakingState_ = next;
+    if (next instanceof Attendee) {
+      this.lastSpeaker_ = next;
+    }
+  }
+
+  /** The attendee who most recently held the floor, kept over pauses and mayhems. */
+  get lastSpeaker(): Attendee | null {
+    return this.lastSpeaker_;
   }
 
   /** Finished speaking runs, oldest first; the still-running state is not included. */
