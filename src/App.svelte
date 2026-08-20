@@ -17,8 +17,8 @@
   }
 
   $effect(() => {
-    const speaker = meeting.speakingState;
-    if (speaker instanceof Attendee) {
+    const speaker = meeting.lastSpeaker;
+    if (speaker) {
       ensureSpeakerInView(speaker);
     }
   });
@@ -34,22 +34,18 @@
       return;
 
     switch (event.key.toLowerCase()) {
-      case "j": {
-        const previous = meeting.adjacentSpeakingState(-1);
-        if (previous !== null) meeting.speakingState = previous;
+      case "j":
+        meeting.advance(-1);
         break;
-      }
 
       case "k":
         if (meeting.lastSpeaker)
           meeting.toggleSpeakingState(meeting.lastSpeaker);
         break;
 
-      case "l": {
-        const next = meeting.adjacentSpeakingState(1);
-        if (next !== null) meeting.speakingState = next;
+      case "l":
+        meeting.advance(1);
         break;
-      }
 
       case "m":
         meeting.toggleSpeakingState(SpecialSpeakingState.Mayhem);
@@ -83,9 +79,8 @@
               <button
                 class="button"
                 title="Previous speaker"
-                disabled={meeting.adjacentSpeakingState(-1) === null}
-                onclick={() =>
-                  (meeting.speakingState = meeting.adjacentSpeakingState(-1)!)}
+                disabled={!meeting.canAdvance(-1)}
+                onclick={() => meeting.advance(-1)}
               >
                 ⏮
               </button>
@@ -128,9 +123,8 @@
               <button
                 class="button"
                 title="Next speaker"
-                disabled={meeting.adjacentSpeakingState(1) === null}
-                onclick={() =>
-                  (meeting.speakingState = meeting.adjacentSpeakingState(1)!)}
+                disabled={!meeting.canAdvance(1)}
+                onclick={() => meeting.advance(1)}
               >
                 ⏭
               </button>

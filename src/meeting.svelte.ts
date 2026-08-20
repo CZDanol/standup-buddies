@@ -184,13 +184,11 @@ export class Meeting {
    */
   adjacentSpeaker(step: 1 | -1): Attendee | null {
     const order = this.order;
-    const reference = this.lastSpeaker_;
+    const reference = this.lastSpeaker;
+    // No reference means nobody is present, so there is no adjacent speaker either.
+    if (!reference) return null;
 
-    let index = reference
-      ? order.indexOf(reference) + step
-      // Before anyone has spoken, only "next" has somewhere to go: the start.
-      : (step === 1 ? 0 : -1);
-
+    let index = order.indexOf(reference) + step;
     for (; index >= 0 && index < order.length; index += step) {
       if (order[index].isPresent) {
         return order[index];
@@ -199,9 +197,29 @@ export class Meeting {
     return null;
   }
 
-  adjacentSpeakingState(step: 1 | -1): SpeakingState | null {
-    return this.adjacentSpeaker(step)
-      ?? (this.speakingState !== SpecialSpeakingState.Pause ? SpecialSpeakingState.Pause : null);
+  /** Whether advance(step) has anywhere to go. */
+  canAdvance(step: 1 | -1): boolean {
+    return (
+      this.adjacentSpeaker(step) !== null ||
+      // Stepping past either end pauses, which is a change only while not paused.
+      this.speakingState_ !== SpecialSpeakingState.Pause
+    );
+  }
+
+  /**
+   * Moves one present attendee over in the speaking order.
+   * While paused only the pending speaker changes; otherwise the floor moves,
+   * and stepping past either end pauses.
+   */
+  advance(step: 1 | -1): void {
+    const adjacent = this.adjacentSpeaker(step);
+    if (!adjacent) {
+      this.speakingState = SpecialSpeakingState.Pause;
+    } else if (this.speakingState_ === SpecialSpeakingState.Pause) {
+      this.lastSpeaker_ = adjacent;
+    } else {
+      this.speakingState = adjacent;
+    }
   }
 
   /** Total time spent in the given speaking state. */
