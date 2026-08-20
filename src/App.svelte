@@ -29,7 +29,7 @@
                 class:is-light={meeting.speakingState ===
                   SpecialSpeakingState.Pause}
                 onclick={() =>
-                  (meeting.speakingState = SpecialSpeakingState.Pause)}
+                  meeting.toggleSpeakingState(SpecialSpeakingState.Pause)}
               >
                 Pause
               </button>

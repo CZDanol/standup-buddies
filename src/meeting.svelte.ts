@@ -163,8 +163,15 @@ export class Meeting {
 
   /** Activates the given speaking state, or pauses if it is already active. */
   toggleSpeakingState(state: SpeakingState): void {
-    this.speakingState =
-      this.speakingState_ === state ? SpecialSpeakingState.Pause : state;
+    if (this.speakingState_ !== state)
+      this.speakingState = state;
+
+    else if (state === SpecialSpeakingState.Pause && this.lastSpeaker_)
+      // Unpause - return to the last speaker
+      this.speakingState = this.lastSpeaker_;
+
+    else
+      this.speakingState = SpecialSpeakingState.Pause;
   }
 
   /** Total time spent in the given speaking state. */
