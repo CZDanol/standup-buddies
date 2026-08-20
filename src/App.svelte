@@ -22,11 +22,53 @@
       ensureSpeakerInView(speaker);
     }
   });
+
+  /** Keyboard shortcuts for the navbar controls. */
+  function onKeydown(event: KeyboardEvent): void {
+    // Leave typing (the seed field) and browser shortcuts alone.
+    if (event.ctrlKey || event.metaKey || event.altKey) return;
+    if (
+      event.target instanceof Element &&
+      event.target.closest("input, textarea, select, [contenteditable]")
+    )
+      return;
+
+    switch (event.key.toLowerCase()) {
+      case "j": {
+        const previous = meeting.adjacentSpeakingState(-1);
+        if (previous !== null) meeting.speakingState = previous;
+        break;
+      }
+
+      case "k":
+        if (meeting.lastSpeaker)
+          meeting.toggleSpeakingState(meeting.lastSpeaker);
+        break;
+
+      case "l": {
+        const next = meeting.adjacentSpeakingState(1);
+        if (next !== null) meeting.speakingState = next;
+        break;
+      }
+
+      case "m":
+        meeting.toggleSpeakingState(SpecialSpeakingState.Mayhem);
+        break;
+
+      default:
+        return;
+    }
+
+    // Keep the handled key from also scrolling or re-activating the focused button.
+    event.preventDefault();
+  }
 </script>
 
 <svelte:head>
   <title>{meeting.title}</title>
 </svelte:head>
+
+<svelte:window onkeydown={onKeydown} />
 
 <nav class="navbar is-fixed-top" aria-label="meeting controls">
   <div class="container is-max-desktop">
@@ -36,15 +78,22 @@
       </div>
       <div class="navbar-item ml-auto">
         <div class="buttons are-small is-flex-wrap-nowrap">
-          <button
-            class="button"
-            title="Previous speaker"
-            disabled={meeting.adjacentSpeakingState(-1) === null}
-            onclick={() =>
-              (meeting.speakingState = meeting.adjacentSpeakingState(-1)!)}
-          >
-            ⏮
-          </button>
+          <div class="field has-addons mb-0">
+            <p class="control">
+              <button
+                class="button"
+                title="Previous speaker"
+                disabled={meeting.adjacentSpeakingState(-1) === null}
+                onclick={() =>
+                  (meeting.speakingState = meeting.adjacentSpeakingState(-1)!)}
+              >
+                ⏮
+              </button>
+            </p>
+            <p class="control">
+              <span class="button is-static key-hint">J</span>
+            </p>
+          </div>
 
           {#if meeting.lastSpeaker}
             <div class="field has-addons mb-0">
@@ -68,18 +117,28 @@
                   {formatDuration(meeting.lastSpeaker.speakingTimeMs)}
                 </span>
               </p>
+              <p class="control">
+                <span class="button is-static key-hint">K</span>
+              </p>
             </div>
           {/if}
 
-          <button
-            class="button"
-            title="Next speaker"
-            disabled={meeting.adjacentSpeakingState(1) === null}
-            onclick={() =>
-              (meeting.speakingState = meeting.adjacentSpeakingState(1)!)}
-          >
-            ⏭
-          </button>
+          <div class="field has-addons mb-0">
+            <p class="control">
+              <button
+                class="button"
+                title="Next speaker"
+                disabled={meeting.adjacentSpeakingState(1) === null}
+                onclick={() =>
+                  (meeting.speakingState = meeting.adjacentSpeakingState(1)!)}
+              >
+                ⏭
+              </button>
+            </p>
+            <p class="control">
+              <span class="button is-static key-hint">L</span>
+            </p>
+          </div>
 
           <div class="field has-addons">
             <p class="control">
@@ -99,6 +158,9 @@
                   meeting.speakingTimeMs(SpecialSpeakingState.Mayhem),
                 )}
               </span>
+            </p>
+            <p class="control">
+              <span class="button is-static key-hint">M</span>
             </p>
           </div>
         </div>
@@ -214,6 +276,15 @@
      Bulma has no helper for tabular digits. */
   .duration {
     font-variant-numeric: tabular-nums;
+  }
+
+  /* Shortcut hints are fine print; Bulma's smallest text size is what the
+     small buttons already use, and its buttons have no tighter padding.
+     The explicit height keeps the shrunken addon as tall as its neighbors. */
+  .key-hint {
+    font-size: 0.6em;
+    padding-inline: 0.6em;
+    height: 100%;
   }
 
   /* Breathing room for scrollIntoView(block: "nearest") when jumping to the current speaker;
