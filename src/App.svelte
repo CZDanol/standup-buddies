@@ -93,7 +93,9 @@
             </p>
             <p class="control">
               <span class="button is-static has-text-text duration">
-                {formatDuration(meeting.speakingTimeMs(SpecialSpeakingState.Mayhem))}
+                {formatDuration(
+                  meeting.speakingTimeMs(SpecialSpeakingState.Mayhem),
+                )}
               </span>
             </p>
           </div>
@@ -158,7 +160,9 @@
                     </button>
                   </p>
                   <p class="control">
-                    <span class="button is-small is-static has-text-text duration">
+                    <span
+                      class="button is-small is-static has-text-text duration"
+                    >
                       {formatDuration(attendee.speakingTimeMs)}
                     </span>
                   </p>
@@ -199,9 +203,9 @@
   .table tbody tr,
   .table tbody td {
     transition:
-      background-color 0.5s ease,
-      border-color 0.5s ease,
-      color 0.5s ease;
+      background-color 0.3s ease,
+      border-color 0.3s ease,
+      color 0.3s ease;
   }
 
   /* The ticking durations otherwise wobble with every digit change;
